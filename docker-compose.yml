@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: property-rental-db
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rental_user -d property_rental"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: property-rental-mail
+    ports:
+      - '1025:1025'   # SMTP — Spring Boot sends here
+      - '8025:8025'   # Web UI — view emails at http://localhost:8025
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    container_name: property-rental-api
+    ports:
+      - '8081:8081'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://postgres:5432/property_rental
+      - DB_USERNAME=rental_user
+      - DB_PASSWORD=rental_password
+      - JWT_SECRET=MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
+      - JWT_EXPIRATION=900000
+      - JWT_REFRESH_EXPIRATION=604800000
+      - RAZORPAY_KEY_ID=rzp_test_dummykey
+      - RAZORPAY_KEY_SECRET=dummysecret
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
+      - SPRING_MAIL_HOST=mailpit
+      - SPRING_MAIL_PORT=1025
+
+volumes:
+  pgdata:
