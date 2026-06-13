@@ -1,0 +1,27 @@
+# Exclude git
+.git/
+.gitignore
+
+# Exclude build files
+target/
+**/target/
+build/
+**/build/
+dist/
+**/dist/
+
+# Exclude dependencies
+node_modules/
+**/node_modules/
+
+# Exclude local settings and logs
+*.log
+.env
+.env.*
+.env.local
+
+# Exclude IDEs
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
