@@ -1,0 +1,16 @@
+{
+  "name": "property-rental-platform",
+  "private": true,
+  "workspaces": [
+    "apps/customer",
+    "apps/admin"
+  ],
+  "scripts": {
+    "dev:customer": "npm run dev -w customer",
+    "dev:admin": "npm run dev -w admin",
+    "dev": "npm run dev --workspaces --if-present",
+    "build:customer": "npm run build -w customer",
+    "build:admin": "npm run build -w admin",
+    "build": "npm run build --workspaces --if-present"
+  }
+}
