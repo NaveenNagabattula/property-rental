@@ -1,0 +1,208 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Property Rental - Properties API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/properties": {
+      "get": {
+        "summary": "Search and list properties (paginated)",
+        "tags": ["Properties"],
+        "parameters": [
+          { "name": "location", "in": "query", "schema": { "type": "string" } },
+          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "guests", "in": "query", "schema": { "type": "integer", "minimum": 1 } },
+          { "name": "minPrice", "in": "query", "schema": { "type": "number" } },
+          { "name": "maxPrice", "in": "query", "schema": { "type": "number" } },
+          { "name": "propertyType", "in": "query", "schema": { "type": "string", "enum": ["APARTMENT","HOUSE","VILLA","CABIN"] } },
+          { "name": "amenities", "in": "query", "schema": { "type": "array", "items": { "type": "string" } } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 0 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 12 } },
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["price_asc","price_desc","rating_desc"] } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of active properties",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PropertyPageResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new property listing (Host only)",
+        "tags": ["Properties"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatePropertyRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Property created in DRAFT status" },
+          "400": { "description": "Validation error" },
+          "403": { "description": "Not a Host" }
+        }
+      }
+    },
+    "/api/v1/properties/{id}": {
+      "get": {
+        "summary": "Get property detail",
+        "tags": ["Properties"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Property detail",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PropertyDetailResponse" }
+              }
+            }
+          },
+          "404": { "description": "Property not found" }
+        }
+      },
+      "put": {
+        "summary": "Update a property listing (Host or Admin)",
+        "tags": ["Properties"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePropertyRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Property updated" },
+          "403": { "description": "Not authorized" },
+          "404": { "description": "Property not found" }
+        }
+      }
+    },
+    "/api/v1/properties/{id}/submit": {
+      "post": {
+        "summary": "Submit property for review (DRAFT -> PENDING_REVIEW)",
+        "tags": ["Properties"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": { "description": "Property submitted for review" },
+          "403": { "description": "Only the listing host can submit" },
+          "409": { "description": "Property is not in DRAFT status" }
+        }
+      }
+    },
+    "/api/v1/properties/host/my-listings": {
+      "get": {
+        "summary": "Get all listings for the authenticated host (paginated)",
+        "tags": ["Properties"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 0 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": { "description": "Host's own paginated listings" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreatePropertyRequest": {
+        "type": "object",
+        "required": ["title","description","address","latitude","longitude","pricePerNight","guestCapacity","propertyType"],
+        "properties": {
+          "title": { "type": "string", "maxLength": 150 },
+          "description": { "type": "string", "maxLength": 2000 },
+          "address": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" },
+          "pricePerNight": { "type": "number", "minimum": 1 },
+          "guestCapacity": { "type": "integer", "minimum": 1 },
+          "bedroomCount": { "type": "integer", "minimum": 0 },
+          "bathroomCount": { "type": "integer", "minimum": 0 },
+          "propertyType": { "type": "string", "enum": ["APARTMENT","HOUSE","VILLA","CABIN"] },
+          "amenities": { "type": "array", "items": { "type": "string" } },
+          "photoUrls": { "type": "array", "items": { "type": "string", "format": "uri" } }
+        }
+      },
+      "UpdatePropertyRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "pricePerNight": { "type": "number" },
+          "amenities": { "type": "array", "items": { "type": "string" } },
+          "photoUrls": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "PropertySummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "address": { "type": "string" },
+          "pricePerNight": { "type": "number" },
+          "guestCapacity": { "type": "integer" },
+          "propertyType": { "type": "string" },
+          "status": { "type": "string" },
+          "thumbnailUrl": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" }
+        }
+      },
+      "PropertyDetailResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/PropertySummaryResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "amenities": { "type": "array", "items": { "type": "string" } },
+              "photoUrls": { "type": "array", "items": { "type": "string" } },
+              "host": { "$ref": "#/components/schemas/HostSummary" }
+            }
+          }
+        ]
+      },
+      "PropertyPageResponse": {
+        "type": "object",
+        "properties": {
+          "content": { "type": "array", "items": { "$ref": "#/components/schemas/PropertySummaryResponse" } },
+          "page": { "type": "integer" },
+          "size": { "type": "integer" },
+          "totalElements": { "type": "integer" },
+          "totalPages": { "type": "integer" }
+        }
+      },
+      "HostSummary": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    }
+  }
+}

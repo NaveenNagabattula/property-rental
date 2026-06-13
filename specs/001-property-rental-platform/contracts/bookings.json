@@ -1,0 +1,164 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Property Rental - Bookings & Payments API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/bookings": {
+      "post": {
+        "summary": "Create a booking request (Guest only)",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateBookingRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Booking created (PENDING for Request-to-Book, or Razorpay order created for Instant Book)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BookingResponse" }
+              }
+            }
+          },
+          "400": { "description": "Date conflict or validation error" },
+          "403": { "description": "Not a Guest or Guest is the property owner" }
+        }
+      },
+      "get": {
+        "summary": "Get all bookings for the authenticated guest (paginated)",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["PENDING","CONFIRMED","COMPLETED","CANCELLED"] } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 0 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": { "description": "Paginated list of guest bookings" }
+        }
+      }
+    },
+    "/api/v1/bookings/{id}": {
+      "get": {
+        "summary": "Get booking detail",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": { "description": "Booking detail with itemized breakdown" },
+          "403": { "description": "Not authorized to view this booking" },
+          "404": { "description": "Booking not found" }
+        }
+      }
+    },
+    "/api/v1/bookings/{id}/cancel": {
+      "post": {
+        "summary": "Cancel a booking (Guest, Host, or Admin)",
+        "tags": ["Bookings"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CancelBookingRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Booking cancelled. Refund queued for admin review." },
+          "409": { "description": "Booking cannot be cancelled in current state" }
+        }
+      }
+    },
+    "/api/v1/payments/verify": {
+      "post": {
+        "summary": "Verify Razorpay payment signature after checkout",
+        "tags": ["Payments"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PaymentVerifyRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payment verified. Booking confirmed." },
+          "400": { "description": "Signature verification failed" }
+        }
+      }
+    },
+    "/api/v1/payments/webhook": {
+      "post": {
+        "summary": "Razorpay webhook endpoint (public)",
+        "tags": ["Payments"],
+        "description": "Receives payment events from Razorpay. Verifies X-Razorpay-Signature header before processing.",
+        "responses": {
+          "200": { "description": "Webhook processed" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateBookingRequest": {
+        "type": "object",
+        "required": ["propertyId", "startDate", "endDate"],
+        "properties": {
+          "propertyId": { "type": "string", "format": "uuid" },
+          "startDate": { "type": "string", "format": "date" },
+          "endDate": { "type": "string", "format": "date" }
+        }
+      },
+      "BookingResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "propertyId": { "type": "string", "format": "uuid" },
+          "propertyTitle": { "type": "string" },
+          "startDate": { "type": "string", "format": "date" },
+          "endDate": { "type": "string", "format": "date" },
+          "basePrice": { "type": "number" },
+          "serviceFee": { "type": "number" },
+          "taxFee": { "type": "number" },
+          "totalPrice": { "type": "number" },
+          "status": { "type": "string", "enum": ["PENDING","CONFIRMED","COMPLETED","CANCELLED"] },
+          "razorpayOrderId": { "type": "string", "description": "Only present for Instant Book properties" }
+        }
+      },
+      "CancelBookingRequest": {
+        "type": "object",
+        "required": ["reason"],
+        "properties": {
+          "reason": { "type": "string", "minLength": 10, "maxLength": 500 }
+        }
+      },
+      "PaymentVerifyRequest": {
+        "type": "object",
+        "required": ["bookingId","razorpayOrderId","razorpayPaymentId","razorpaySignature"],
+        "properties": {
+          "bookingId": { "type": "string", "format": "uuid" },
+          "razorpayOrderId": { "type": "string" },
+          "razorpayPaymentId": { "type": "string" },
+          "razorpaySignature": { "type": "string" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    }
+  }
+}
