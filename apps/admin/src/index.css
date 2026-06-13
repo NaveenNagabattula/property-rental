@@ -1,0 +1,150 @@
+/* ============================================================
+   Admin App — Global Design System
+   Property Rental Platform
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ---------- Design Tokens ---------- */
+:root {
+  --brand-primary: #6C63FF;
+  --brand-primary-dark: #4B44CC;
+  --brand-secondary: #FF6584;
+  --brand-accent: #43D98C;
+
+  --bg-page: #0D0F1A;
+  --bg-card: #13162A;
+  --bg-card-hover: #181C35;
+  --bg-surface: #1E2240;
+  --bg-input: #252948;
+
+  --text-primary: #F0F2FF;
+  --text-secondary: #9BA3C9;
+  --text-muted: #5C647E;
+
+  --border-color: rgba(108, 99, 255, 0.18);
+  --border-focus: rgba(108, 99, 255, 0.7);
+
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-hover: 0 16px 48px rgba(108, 99, 255, 0.2);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--brand-primary); text-decoration: none; }
+a:hover { color: var(--brand-primary-dark); }
+img { display: block; max-width: 100%; }
+
+/* ---------- Utility ---------- */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-6 { gap: 24px; }
+.text-sm { font-size: 0.875rem; }
+.text-lg { font-size: 1.125rem; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--brand-accent); }
+.text-brand { color: var(--brand-primary); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  font-size: 0.875rem; font-weight: 600; cursor: pointer; border: none;
+  transition: all var(--transition); white-space: nowrap; font-family: inherit;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
+  color: #fff; box-shadow: 0 4px 16px rgba(108, 99, 255, 0.35);
+}
+.btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(108, 99, 255, 0.5); }
+.btn-outline { background: transparent; color: var(--brand-primary); border: 1.5px solid var(--brand-primary); }
+.btn-outline:hover:not(:disabled) { background: rgba(108, 99, 255, 0.08); }
+.btn-ghost { background: transparent; color: var(--text-secondary); }
+.btn-ghost:hover:not(:disabled) { color: var(--text-primary); }
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-card); overflow: hidden;
+}
+
+/* ---------- Form Controls ---------- */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+.form-input, .form-select, .form-textarea {
+  background: var(--bg-input); border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm); color: var(--text-primary); font-family: inherit;
+  font-size: 0.9rem; padding: 10px 14px;
+  transition: border-color var(--transition), box-shadow var(--transition); width: 100%;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none; border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+}
+.form-input::placeholder { color: var(--text-muted); }
+.form-select option { background: var(--bg-surface); }
+
+/* ---------- Navbar Brand ---------- */
+.navbar-brand {
+  font-size: 1.1rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: -0.02em;
+}
+
+/* ---------- Badge ---------- */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 100px; font-size: 0.73rem; font-weight: 600;
+}
+.badge-success { background: rgba(67, 217, 140, 0.15); color: var(--brand-accent); }
+.badge-warning { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.badge-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.badge-info { background: rgba(108, 99, 255, 0.15); color: var(--brand-primary); }
+
+/* ---------- Skeleton ---------- */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-surface) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: var(--radius-sm);
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ---------- Page ---------- */
+.page { min-height: 100%; }
+.section { padding: 40px 0; }
+
+/* ---------- Alert ---------- */
+.alert { padding: 12px 16px; border-radius: var(--radius-sm); border-left: 4px solid; font-size: 0.88rem; }
+.alert-error { background: rgba(239, 68, 68, 0.08); border-color: #ef4444; color: #fca5a5; }
+.alert-success { background: rgba(67, 217, 140, 0.08); border-color: var(--brand-accent); color: #86efac; }
+
+/* ---------- Table ---------- */
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; vertical-align: middle; }
+
+/* ---------- Pagination ---------- */
+.pagination { display: flex; align-items: center; gap: 16px; margin-top: 24px; }
