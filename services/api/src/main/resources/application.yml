@@ -1,0 +1,48 @@
+server:
+  port: ${PORT:8081}
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/property_rental}
+    username: ${DB_USERNAME:rental_user}
+    password: ${DB_PASSWORD:rental_password}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+  mail:
+    host: ${SPRING_MAIL_HOST:localhost}
+    port: ${SPRING_MAIL_PORT:1025}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=}
+    expiration: ${JWT_EXPIRATION:900000} # 15 minutes
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days
+  
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID:rzp_test_dummykey}
+    key-secret: ${RAZORPAY_KEY_SECRET:dummysecret}
+    webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:webhooksecret}
+
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174}

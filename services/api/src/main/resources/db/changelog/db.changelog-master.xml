@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <include file="001-create-users.sql" relativeToChangelogFile="true"/>
+    <include file="002-create-refresh-tokens.sql" relativeToChangelogFile="true"/>
+    <include file="003-create-properties.sql" relativeToChangelogFile="true"/>
+    <include file="004-create-host-applications.sql" relativeToChangelogFile="true"/>
+    <include file="005-create-bookings.sql" relativeToChangelogFile="true"/>
+    <include file="006-create-payments.sql" relativeToChangelogFile="true"/>
+    <include file="007-create-platform-config.sql" relativeToChangelogFile="true"/>
+    <include file="008-create-reviews.sql" relativeToChangelogFile="true"/>
+    <include file="009-create-refund-requests.sql" relativeToChangelogFile="true"/>
+    <include file="010-add-audit-to-availability-blocks.sql" relativeToChangelogFile="true"/>
+    <include file="011-seed-admin-user.sql" relativeToChangelogFile="true"/>
+    <include file="012-update-admin-password.sql" relativeToChangelogFile="true"/>
+    <include file="013-add-deleted-flag-to-users.sql" relativeToChangelogFile="true"/>
+    <include file="014-seed-property-manager.sql" relativeToChangelogFile="true"/>
+    <include file="015-fix-manager-password.sql" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>
